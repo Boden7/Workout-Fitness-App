@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".Login">
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="73dp"
+        android:layout_marginTop="226dp"
+        android:fontFamily="sans-serif-condensed"
+        android:text="Log in with your email and password"
+        android:textAlignment="center"
+        android:textColor="#9C27B0"
+        android:textSize="20sp"
+        android:textStyle="italic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    <EditText
+        android:id="@+id/etEmail"
+        android:layout_width="381dp"
+        android:layout_height="86dp"
+        android:hint="Email"
+        android:inputType="textEmailAddress" />
+    <EditText
+        android:id="@+id/etPassword"
+        android:layout_width="379dp"
+        android:layout_height="84dp"
+        android:hint="Password"
+        android:inputType="textPassword" />
+    <Button
+        android:id="@+id/btnLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:layout_marginTop="26dp"
+        android:layout_gravity="center_horizontal"
+        android:text="Login"
+        android:textAlignment="center" />
+    <Button
+        android:id="@+id/btnCreateAccount"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:layout_marginTop="26dp"
+        android:layout_gravity="center_horizontal"
+        android:text="Create Account"
+        android:textAlignment="center" />
+</LinearLayout>
