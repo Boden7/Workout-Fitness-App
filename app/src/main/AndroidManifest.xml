@@ -28,7 +28,7 @@
             android:name=".CreateAccount"
             android:exported="false"/>
         <activity
-            android:name=".Home"
+            android:name=".HomeActivity"
             android:exported="false"/>
     </application>
     <uses-permission android:name="android.permission.INTERNET" />

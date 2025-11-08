@@ -116,6 +116,8 @@ public class CreateAccount extends AppCompatActivity {
                             userDoc.put("streak", 0);
                             userDoc.put("badges", new ArrayList<String>());
                             userDoc.put("totalXP", 0);
+                            userDoc.put("totalTime", 0);
+                            userDoc.put("course", 0);
                             userDoc.put("lastWorkoutId", null);
                             userDoc.put("friends", new ArrayList<String>());
                             userDoc.put("leaderboard", next);

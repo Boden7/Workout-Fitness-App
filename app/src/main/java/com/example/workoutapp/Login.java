@@ -52,7 +52,7 @@ public class Login extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         Toast.makeText(Login.this, "Login successful", Toast.LENGTH_SHORT).show();
                         // Uncomment once home page is created
-                        Intent intent = new Intent(Login.this, Home.class);
+                        Intent intent = new Intent(Login.this, HomeActivity.class);
                         startActivity(intent);
                     } else {
                         Toast.makeText(Login.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
