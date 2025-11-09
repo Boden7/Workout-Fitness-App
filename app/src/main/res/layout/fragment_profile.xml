@@ -160,6 +160,23 @@
                 android:background="@android:color/darker_gray" />
 
         </LinearLayout>
+        <Button
+            android:id="@+id/signout_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sign Out"
+            android:textColor="@color/black"
+            android:backgroundTint="@color/nav_item_text_color"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="24dp"
+           />
+
+
 
     </LinearLayout>
 </ScrollView>

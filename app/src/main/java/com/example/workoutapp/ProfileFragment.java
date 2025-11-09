@@ -3,12 +3,14 @@ package com.example.workoutapp;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -63,6 +65,17 @@ public class ProfileFragment extends Fragment {
         friendsButton = view.findViewById(R.id.friends_button);
         historyButton = view.findViewById(R.id.history_button);
         friendsListContainer = view.findViewById(R.id.friends_list_container);
+
+
+        Button signOutButton = view.findViewById(R.id.signout_button);
+        signOutButton.setOnClickListener(v -> {
+            mAuth.signOut();
+            Intent intent = new Intent(getActivity(), Login.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            getActivity().finish();
+        });
+
 
         loadUserData();
 
