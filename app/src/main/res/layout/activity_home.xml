@@ -6,6 +6,15 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <!-- Toolbar with Fire Icon -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/home_toolbar"
+        android:padding="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/white"
+        app:title="" />
+
     <!-- Five Fragment stacks -->
     <FrameLayout
         android:id="@+id/fragment_container"

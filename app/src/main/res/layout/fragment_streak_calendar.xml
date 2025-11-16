@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:gravity="center_horizontal">
+
+    <TextView
+        android:id="@+id/tvStreakCount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="0 days"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:paddingBottom="10dp" />
+
+    <!-- Month Switch -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingBottom="12dp">
+
+        <TextView
+            android:id="@+id/btnPrev"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="◀"
+            android:textSize="22sp"
+            android:padding="12dp"/>
+
+        <TextView
+            android:id="@+id/tvMonth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="OCTOBER 2025"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:padding="12dp"/>
+
+        <TextView
+            android:id="@+id/btnNext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="▶"
+            android:textSize="22sp"
+            android:padding="12dp"/>
+    </LinearLayout>
+
+    <!-- Week Header -->
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="7"
+        android:paddingBottom="8dp">
+
+        <TextView android:text="Sun" style="@style/CalendarHeader" />
+        <TextView android:text="Mon" style="@style/CalendarHeader" />
+        <TextView android:text="Tue" style="@style/CalendarHeader" />
+        <TextView android:text="Wed" style="@style/CalendarHeader" />
+        <TextView android:text="Thu" style="@style/CalendarHeader" />
+        <TextView android:text="Fri" style="@style/CalendarHeader" />
+        <TextView android:text="Sat" style="@style/CalendarHeader" />
+
+    </GridLayout>
+
+    <!-- Calendar Days -->
+    <GridLayout
+        android:id="@+id/gridCalendar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="7"
+        android:rowCount="6" />
+
+</LinearLayout>

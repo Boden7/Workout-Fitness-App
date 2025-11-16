@@ -119,6 +119,7 @@ public class CreateAccount extends AppCompatActivity {
                             userDoc.put("totalTime", 0);
                             userDoc.put("course", 0);
                             userDoc.put("lastWorkoutId", null);
+                            userDoc.put("lastWorkoutDate", null);
                             userDoc.put("friends", new ArrayList<String>());
                             userDoc.put("leaderboard", next);
 
