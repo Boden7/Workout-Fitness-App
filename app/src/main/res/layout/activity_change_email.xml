@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/changeEmail"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0A0F24"
+    tools:context=".ChangeEmailActivity">
+
+    <Button
+        android:id="@+id/backButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Back"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="10dp"
+        android:backgroundTint="#007C91"
+        android:textAllCaps="false"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"/>
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        android:text="Change Email"
+        android:textColor="#FFFFFF"
+        android:textSize="32sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/currentEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        android:hint="Current email"
+        android:inputType="textEmailAddress"
+        android:padding="16dp"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#BBBBBB"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@+id/title"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <EditText
+        android:id="@+id/newEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:hint="New Email"
+        android:inputType="textEmailAddress"
+        android:padding="16dp"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#BBBBBB"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@+id/currentEmail"
+        tools:layout_editor_absoluteX="16dp" />
+
+    <Button
+        android:id="@+id/confirmChange"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="60dp"
+        android:backgroundTint="#007C91"
+        android:textSize="16sp"
+        android:text="Confirm Email Change"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
