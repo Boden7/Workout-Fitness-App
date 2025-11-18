@@ -118,6 +118,7 @@ public class CreateAccount extends AppCompatActivity {
                             userDoc.put("totalXP", 0);
                             userDoc.put("totalTime", 0);
                             userDoc.put("course", 0);
+                            userDoc.put("receiveNotifs", false);
                             userDoc.put("lastWorkoutId", null);
                             userDoc.put("lastWorkoutDate", null);
                             userDoc.put("friends", new ArrayList<String>());
