@@ -3,6 +3,7 @@ package com.example.workoutapp;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -93,7 +94,10 @@ public class ProfileFragment extends Fragment {
     }
 
     private void setupClickListeners() {
-        settingsIcon.setOnClickListener(v -> Toast.makeText(getContext(), "Settings clicked", Toast.LENGTH_SHORT).show());
+        settingsIcon.setOnClickListener(v -> {
+            Intent intent = new Intent(getContext(), SettingsActivity.class);
+            startActivity(intent);
+                });
         inviteButton.setOnClickListener(v -> showAddFriendDialog());
 
         friendsButton.setOnClickListener(v -> selectTab(friendsButton));

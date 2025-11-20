@@ -21,7 +21,6 @@ public class Login extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.login);
 
-        // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance();
 
         etEmail = findViewById(R.id.etEmail);
@@ -43,6 +42,11 @@ public class Login extends AppCompatActivity {
         createAccountButton.setOnClickListener(v -> {
             Intent intent = new Intent(Login.this, CreateAccount.class);
             startActivity(intent);
+        });
+
+        Button forgotPasswordButton = findViewById(R.id.btnForgotPassword);
+        forgotPasswordButton.setOnClickListener(v -> {
+            startActivity(new Intent(Login.this, ForgotPasswordActivity.class));
         });
     }
 

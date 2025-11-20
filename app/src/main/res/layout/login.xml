@@ -83,5 +83,17 @@
             android:textColor="#FFFFFF"
             android:textSize="16sp" />
 
+        <Button
+            android:id="@+id/btnForgotPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:padding="16dp"
+            android:backgroundTint="#007C91"
+            android:text="Forgot Password"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp" />
+
     </LinearLayout>
 </ScrollView>

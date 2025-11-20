@@ -30,6 +30,21 @@
         <activity
             android:name=".HomeActivity"
             android:exported="false"/>
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".ChangeEmailActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".ChangePasswordActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".ForgotPasswordActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".DeleteAccountActivity"
+            android:exported="false"/>
     </application>
     <uses-permission android:name="android.permission.INTERNET" />
 
