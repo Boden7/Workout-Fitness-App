@@ -1,0 +1,53 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tvCardioTitle"
+            android:text="Cardio Videos"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="16dp"/>
+
+        <ImageView
+            android:id="@+id/video1"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:src="@drawable/video1"
+            android:scaleType="centerCrop"
+            android:contentDescription="Video 1"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingBottom="16dp"/>
+
+        <ImageView
+            android:id="@+id/video2"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:src="@drawable/video2"
+            android:scaleType="centerCrop"
+            android:contentDescription="Video 2"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingBottom="16dp"/>
+
+        <ImageView
+            android:id="@+id/video3"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:src="@drawable/video3"
+            android:scaleType="centerCrop"
+            android:contentDescription="Video 3"
+            android:clickable="true"
+            android:focusable="true"/>
+
+    </LinearLayout>
+</ScrollView>
