@@ -1,5 +1,6 @@
 package com.example.workoutapp;
 
+import android.widget.TextView;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -7,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
@@ -30,20 +32,33 @@ public class VideoPlayerFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.fragment_video_player, container, false);
 
         VideoView videoView = view.findViewById(R.id.videoView);
         Button btnPlay = view.findViewById(R.id.btnPlay);
         Button btnPause = view.findViewById(R.id.btnPause);
         Button btnStop = view.findViewById(R.id.btnStop);
+        ImageButton backButton = view.findViewById(R.id.backButton);
+        TextView videoTitle = view.findViewById(R.id.videoTitle);
+
+        // Back button
+        backButton.setOnClickListener(v ->
+                getParentFragmentManager().popBackStack()
+        );
 
         String videoName = getArguments().getString(ARG_VIDEO_NAME);
-        Uri videoUri = Uri.parse("android.resource://" + getActivity().getPackageName() + "/raw/" + videoName);
+
+        // Set the title
+        videoTitle.setText(getVideoTitle(videoName));
+
+        // Load the video
+        Uri videoUri = Uri.parse("android.resource://" +
+                requireActivity().getPackageName() + "/raw/" + videoName);
 
         videoView.setVideoURI(videoUri);
         videoView.requestFocus();
 
-        // Buttons
         btnPlay.setOnClickListener(v -> videoView.start());
         btnPause.setOnClickListener(v -> videoView.pause());
         btnStop.setOnClickListener(v -> {
@@ -51,10 +66,25 @@ public class VideoPlayerFragment extends Fragment {
             videoView.seekTo(0);
         });
 
-        // Count when video finishes
-        videoView.setOnCompletionListener(mp -> incrementWatchCount(videoName));
+        videoView.setOnCompletionListener(mp ->
+                incrementWatchCount(videoName)
+        );
 
         return view;
+    }
+
+    private String getVideoTitle(String videoName) {
+        switch (videoName) {
+            case "video1": return "Best Ever 3 Minute Cardio Workout";
+            case "video2": return "High-Intensity Cardio Burn";
+            case "video3": return "10 Minutes At Home Cardio";
+
+            case "video4": return "How To STRETCH Your Upper Body in 3 Minutes";
+            case "video5": return "3 Minutes Full Body Stretch";
+            case "video6": return "3 Minutes Neck Fix";
+
+            default: return "Workout Video";
+        }
     }
 
     private void incrementWatchCount(String videoName) {
@@ -65,14 +95,11 @@ public class VideoPlayerFragment extends Fragment {
         int count = context.getSharedPreferences("video_prefs", Context.MODE_PRIVATE)
                 .getInt(key, 0);
 
-        count++;
-
         context.getSharedPreferences("video_prefs", Context.MODE_PRIVATE)
                 .edit()
-                .putInt(key, count)
+                .putInt(key, count + 1)
                 .apply();
 
-
-        System.out.println(videoName + " watched fully " + count + " times");
+        System.out.println(videoName + " watched fully " + (count + 1) + " times");
     }
 }

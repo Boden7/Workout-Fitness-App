@@ -1,4 +1,5 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -8,6 +9,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <!-- Back Button -->
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_back"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Back" />
+
+        <!-- Title -->
         <TextView
             android:id="@+id/tvCardioTitle"
             android:text="Cardio Videos"
@@ -15,39 +26,72 @@
             android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingBottom="16dp"/>
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp" />
 
-        <ImageView
-            android:id="@+id/video1"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:src="@drawable/video1"
-            android:scaleType="centerCrop"
-            android:contentDescription="Video 1"
-            android:clickable="true"
-            android:focusable="true"
-            android:paddingBottom="16dp"/>
 
-        <ImageView
-            android:id="@+id/video2"
+        <!-- ===== VIDEO CARD 1 ===== -->
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:src="@drawable/video2"
-            android:scaleType="centerCrop"
-            android:contentDescription="Video 2"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:background="@drawable/rounded_bg"
+            android:layout_marginBottom="20dp"
             android:clickable="true"
-            android:focusable="true"
-            android:paddingBottom="16dp"/>
+            android:focusable="true">
 
-        <ImageView
-            android:id="@+id/video3"
+            <ImageView
+                android:id="@+id/video1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:src="@drawable/video1"
+                android:scaleType="fitCenter" />
+        </LinearLayout>
+
+
+        <!-- ===== VIDEO CARD 2 ===== -->
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:src="@drawable/video3"
-            android:scaleType="centerCrop"
-            android:contentDescription="Video 3"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:background="@drawable/rounded_bg"
+            android:layout_marginBottom="20dp"
             android:clickable="true"
-            android:focusable="true"/>
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/video2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:src="@drawable/video2"
+                android:scaleType="fitCenter" />
+        </LinearLayout>
+
+
+        <!-- ===== VIDEO CARD 3 ===== -->
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:background="@drawable/rounded_bg"
+            android:layout_marginBottom="20dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:id="@+id/video3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:src="@drawable/video3"
+                android:scaleType="fitCenter" />
+        </LinearLayout>
 
     </LinearLayout>
+
 </ScrollView>

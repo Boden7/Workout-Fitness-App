@@ -21,8 +21,16 @@ public class CardioVideosFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
+        // BACK BUTTON
+        ImageView backButton = view.findViewById(R.id.backButton);
+        backButton.setOnClickListener(v ->
+                requireActivity().getSupportFragmentManager().popBackStack()
+        );
+
+        // Thumbnails
         ImageView video1 = view.findViewById(R.id.video1);
         ImageView video2 = view.findViewById(R.id.video2);
         ImageView video3 = view.findViewById(R.id.video3);
@@ -34,13 +42,15 @@ public class CardioVideosFragment extends Fragment {
         return view;
     }
 
-    // Method must be outside onCreateView
     private void openVideo(String videoName) {
         Fragment fragment = VideoPlayerFragment.newInstance(videoName);
-        getParentFragmentManager()
+        requireActivity().getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.fragment_container, fragment) // your fragment container in activity
+                .replace(R.id.fragment_container, fragment)
                 .addToBackStack(null)
                 .commit();
     }
 }
+//video4: https://www.youtube.com/watch?v=Jv7cs7LWpmA&t=2s
+//video5: https://www.youtube.com/watch?v=q2NZyW5EP5A
+//video6: https://www.youtube.com/watch?v=PqqJBaE4srs

@@ -115,8 +115,8 @@ public class CardioFragment extends Fragment {
             // Perform the fragment transaction
             getParentFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.fragment_container, cardioVideosFragment) // your activity's container ID
-                    .addToBackStack(null) // enables back navigation
+                    .replace(R.id.fragment_container, cardioVideosFragment)
+                    .addToBackStack(null)
                     .commit();
         });
 
