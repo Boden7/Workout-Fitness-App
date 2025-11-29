@@ -82,6 +82,12 @@ public class VideoPlayerFragment extends Fragment {
             case "video4": return "How To STRETCH Your Upper Body in 3 Minutes";
             case "video5": return "3 Minutes Full Body Stretch";
             case "video6": return "3 Minutes Neck Fix";
+            case "video7": return "SHORT HIIT WORKOUT";
+            case "video8": return "STRONG CORE 3-Minute Workout Challenge";
+            case "video9": return "Bowflex® Bodyweight Workout";
+            case "video10": return "3 Minute Ab Workout";
+            case "video11": return "3 MINUTE EASY TO FOLLOW DANCE WORKOUT";
+
 
             default: return "Workout Video";
         }

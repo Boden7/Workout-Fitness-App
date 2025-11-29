@@ -78,7 +78,7 @@
         android:scaleType="fitCenter"
         android:background="@drawable/rounded_bg"
         android:padding="10dp"
-        android:src="@drawable/videos"
+        android:src="@drawable/flexibility"
         app:layout_constraintTop_toBottomOf="@id/videosLabel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
