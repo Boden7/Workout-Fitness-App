@@ -34,8 +34,6 @@
         <LinearLayout
             android:id="@+id/cardVideo7"
             android:orientation="vertical"
-            android:padding="12dp"
-            android:background="@drawable/rounded_bg"
             android:layout_marginBottom="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -45,18 +43,18 @@
             <ImageView
                 android:id="@+id/video7"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="200dp"
                 android:adjustViewBounds="true"
-                android:src="@drawable/video7"
-                android:scaleType="fitCenter" />
+                android:scaleType="centerCrop"
+                android:background="@drawable/rounded_bg"
+                android:clipToOutline="true"
+                android:src="@drawable/video7" />
         </LinearLayout>
 
         <!-- ===== VIDEO CARD 8 ===== -->
         <LinearLayout
             android:id="@+id/cardVideo8"
             android:orientation="vertical"
-            android:padding="12dp"
-            android:background="@drawable/rounded_bg"
             android:layout_marginBottom="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -66,18 +64,18 @@
             <ImageView
                 android:id="@+id/video8"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="200dp"
                 android:adjustViewBounds="true"
-                android:src="@drawable/video8"
-                android:scaleType="fitCenter" />
+                android:scaleType="centerCrop"
+                android:background="@drawable/rounded_bg"
+                android:clipToOutline="true"
+                android:src="@drawable/video8" />
         </LinearLayout>
 
         <!-- ===== VIDEO CARD 9 ===== -->
         <LinearLayout
             android:id="@+id/cardVideo9"
             android:orientation="vertical"
-            android:padding="12dp"
-            android:background="@drawable/rounded_bg"
             android:layout_marginBottom="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -87,10 +85,12 @@
             <ImageView
                 android:id="@+id/video9"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="200dp"
                 android:adjustViewBounds="true"
-                android:src="@drawable/video9"
-                android:scaleType="fitCenter" />
+                android:scaleType="centerCrop"
+                android:background="@drawable/rounded_bg"
+                android:clipToOutline="true"
+                android:src="@drawable/video9" />
         </LinearLayout>
 
     </LinearLayout>

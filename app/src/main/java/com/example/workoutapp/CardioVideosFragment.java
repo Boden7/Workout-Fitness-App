@@ -51,11 +51,14 @@ public class CardioVideosFragment extends Fragment {
                 .commit();
     }
 }
-//video7:https://www.youtube.com/watch?v=5WkW5DQUdEM
-//video8:https://www.youtube.com/watch?v=N1n_c4N0p-0
+//video7: https://www.youtube.com/watch?v=5WkW5DQUdEM
+//video8: https://www.youtube.com/watch?v=N1n_c4N0p-0
 //video9: https://www.youtube.com/watch?v=ynUw0YsrmSg
 //video10:https://www.youtube.com/watch?v=K1oPPW72-QY
 //video11:https://www.youtube.com/watch?v=XR51UhfcKoU
 //video4: https://www.youtube.com/watch?v=Jv7cs7LWpmA&t=2s
 //video5: https://www.youtube.com/watch?v=q2NZyW5EP5A
 //video6: https://www.youtube.com/watch?v=PqqJBaE4srs
+//video1: https://www.youtube.com/watch?v=GO7R2Nm78Ac&t=3s
+//video2: https://www.youtube.com/watch?v=d6EX80cR_zw
+//video3: https://www.youtube.com/watch?v=PqqJBaE4srs&t=302s

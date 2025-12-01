@@ -34,8 +34,6 @@
         <LinearLayout
             android:id="@+id/cardVideo10"
             android:orientation="vertical"
-            android:padding="12dp"
-            android:background="@drawable/rounded_bg"
             android:layout_marginBottom="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -45,18 +43,18 @@
             <ImageView
                 android:id="@+id/video10"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="200dp"
                 android:adjustViewBounds="true"
-                android:src="@drawable/video10"
-                android:scaleType="fitCenter" />
+                android:scaleType="centerCrop"
+                android:background="@drawable/rounded_bg"
+                android:clipToOutline="true"
+                android:src="@drawable/video10" />
         </LinearLayout>
 
         <!-- ===== VIDEO CARD 11 ===== -->
         <LinearLayout
             android:id="@+id/cardVideo11"
             android:orientation="vertical"
-            android:padding="12dp"
-            android:background="@drawable/rounded_bg"
             android:layout_marginBottom="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -66,9 +64,11 @@
             <ImageView
                 android:id="@+id/video11"
                 android:layout_width="match_parent"
-                android:layout_height="185dp"
+                android:layout_height="200dp"
                 android:adjustViewBounds="true"
-                android:scaleType="fitCenter"
+                android:scaleType="centerCrop"
+                android:background="@drawable/rounded_bg"
+                android:clipToOutline="true"
                 android:src="@drawable/video11" />
         </LinearLayout>
 
