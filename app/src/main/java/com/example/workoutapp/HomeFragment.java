@@ -64,7 +64,7 @@ public class HomeFragment extends Fragment {
                 Long xp      = documentSnapshot.getLong("totalXP");
                 Long time    = documentSnapshot.getLong("totalTime");
                 Long level    = documentSnapshot.getLong("level");
-                Long courses = documentSnapshot.getLong("course");
+                Long courses = documentSnapshot.getLong("totalWorkout");
 
                 List<Object> badgesList = (List<Object>) documentSnapshot.get("badges");
                 int badgeCount = 0;

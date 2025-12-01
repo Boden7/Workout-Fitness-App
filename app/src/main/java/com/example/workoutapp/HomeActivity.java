@@ -30,6 +30,8 @@ public class HomeActivity extends AppCompatActivity {
                 selectedFragment = new WorkoutFragment();
             } else if (itemId == R.id.nav_challenge) {
                 selectedFragment = new ChallengeFragment();
+            } else if (itemId == R.id.nav_leaderboard) {
+                selectedFragment = new LeaderboardFragment();
             }
 
             if (selectedFragment != null) {

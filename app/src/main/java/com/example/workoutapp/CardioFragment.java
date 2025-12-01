@@ -2,16 +2,27 @@ package com.example.workoutapp;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+
+import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.time.LocalDate;
+import java.time.ZoneId;
 
 public class CardioFragment extends Fragment {
 
@@ -87,9 +98,32 @@ public class CardioFragment extends Fragment {
         stopButton.setOnClickListener(v -> {
             viewModel.isRunning = false;
 
-            // Calculate total minutes before resetting
-            int elapsedMinutes = viewModel.seconds / 60;
-            minutesText.setText(String.valueOf(elapsedMinutes));
+            int mins = viewModel.seconds / 60;
+
+            // Update local UI for minutes
+            minutesText.setText(String.valueOf(mins));
+
+            if (mins > 0) {
+                // 1. Update Basic Stats (XP, Time, Count)
+                long xpToAdd = mins * 100L;
+                updateUserStats(xpToAdd, mins);
+
+                // Log workout in workouts collection
+                logWorkout(xpToAdd, mins, "cardio");
+
+                Toast.makeText(getContext(),
+                        "You earned " + xpToAdd + " XP and logged " + mins + " mins!",
+                        Toast.LENGTH_SHORT).show();
+
+                // 2. Check Streak Condition (> 10 mins)
+                if (mins >= 10) {
+                    updateWorkoutAndStreak();
+                } else {
+                    Toast.makeText(getContext(),
+                            "Workout needs to be at least 10 mins to update streak.",
+                            Toast.LENGTH_LONG).show();
+                }
+            }
 
             // Reset timer
             viewModel.seconds = 0;
@@ -99,6 +133,7 @@ public class CardioFragment extends Fragment {
 
             handler.removeCallbacks(timerRunnable);
         });
+
 
         // Back button
         backButton.setOnClickListener(v -> {
@@ -120,10 +155,154 @@ public class CardioFragment extends Fragment {
                     .commit();
         });
 
-
-
         return view;
     }
+
+    private void updateWorkoutAndStreak() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) return;
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        DocumentReference userRef = db.collection("users").document(uid);
+
+        userRef.get().addOnSuccessListener(doc -> {
+            Timestamp lastTS = doc.getTimestamp("lastWorkoutDate");
+            Long currentStreak = doc.getLong("streak");
+            if (currentStreak == null) currentStreak = 0L;
+
+            LocalDate today = LocalDate.now();
+            long newStreak = currentStreak;
+            long xpBonus = 0;
+
+            if (lastTS == null) {
+                // First time ever
+                newStreak = 1;
+                xpBonus = 500;
+            } else {
+                LocalDate lastDate = lastTS.toDate()
+                        .toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate();
+
+                if (today.isEqual(lastDate)) {
+                    // Same day: No streak change, no XP bonus
+                    newStreak = currentStreak;
+                    xpBonus = 0;
+                } else if (today.minusDays(1).isEqual(lastDate)) {
+                    // Consecutive day: Increment streak
+                    newStreak = currentStreak + 1;
+                    
+                    // Calculate Bonus based on NEW Streak
+                    if (newStreak == 2) {
+                        xpBonus = 1000;
+                    } else if (newStreak >= 3) {
+                        xpBonus = 1500;
+                    } else {
+                        xpBonus = 500; 
+                    }
+                } else {
+                    // Streak broken (missed a day): Reset to 1
+                    newStreak = 1;
+                    xpBonus = 500;
+                }
+            }
+
+            // Perform Updates
+            if (xpBonus > 0) {
+                long finalXpBonus = xpBonus;
+                // Update Streak, Date, and Add Bonus XP
+                userRef.update(
+                        "streak", newStreak,
+                        "lastWorkoutDate", Timestamp.now(),
+                        "totalXP", FieldValue.increment(xpBonus)
+                ).addOnSuccessListener(aVoid -> {
+                    // Check if this bonus XP caused a level up
+                    checkForLevelUp(uid, finalXpBonus);
+                });
+                Toast.makeText(getContext(), "You completed today's streak (Day " + newStreak + ")! Bonus: " + xpBonus + " XP!", Toast.LENGTH_LONG).show();
+            } else {
+                // Same day update (just update timestamp to latest time)
+                userRef.update("lastWorkoutDate", Timestamp.now());
+                Toast.makeText(getContext(), "You have already completed today's streak.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void updateUserStats(long xpToAdd, int minutesToAdd) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            DocumentReference userRef = db.collection("users").document(uid);
+            // Atomically increment "totalXP", "totalTime", "totalWorkout"
+            userRef.update(
+                "totalXP", FieldValue.increment(xpToAdd),
+                "totalTime", FieldValue.increment(minutesToAdd),
+                "totalWorkout", FieldValue.increment(1)
+            ).addOnSuccessListener(aVoid -> {
+                // Check if this regular XP caused a level up
+                checkForLevelUp(uid, xpToAdd);
+            }).addOnFailureListener(e -> {
+                Log.e("CardioFragment", "Error updating stats", e);
+                Toast.makeText(getContext(), "Failed to update stats: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            });
+        }
+    }
+
+    private void checkForLevelUp(String uid, long addedXP) {
+        FirebaseFirestore.getInstance().collection("users").document(uid).get()
+            .addOnSuccessListener(documentSnapshot -> {
+                if (documentSnapshot.exists()) {
+                    Long totalXP = documentSnapshot.getLong("totalXP");
+                    if (totalXP != null) {
+                        long currentLevel = totalXP / 1000;
+                        // Calculate what the XP was before the addition
+                        long previousLevel = (totalXP - addedXP) / 1000;
+                        
+                        if (currentLevel > previousLevel) {
+                            String badgeName = currentLevel + " Level Badge";
+                            
+                            // Update level and add badge in Firestore
+                            FirebaseFirestore.getInstance().collection("users").document(uid)
+                                    .update(
+                                        "level", currentLevel,
+                                        "badges", FieldValue.arrayUnion(badgeName)
+                                    );
+                            Toast.makeText(getContext(), "Level Up! You are now Level " + currentLevel + "! Badge Earned: " + badgeName, Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }
+            });
+    }
+
+    private void logWorkout(long xp, int durationMinutes, String type) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            return;
+        }
+
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        // Build workout document data
+        java.util.Map<String, Object> workoutData = new java.util.HashMap<>();
+        workoutData.put("userID", uid);
+        workoutData.put("xp", xp);
+        workoutData.put("workoutType", type);
+        workoutData.put("date", Timestamp.now());
+        workoutData.put("duration", durationMinutes);
+
+        db.collection("workouts")
+                .add(workoutData)
+                .addOnSuccessListener(docRef ->
+                        Log.d("CardioFragment", "Workout logged with ID: " + docRef.getId())
+                )
+                .addOnFailureListener(e -> {
+                    Log.e("CardioFragment", "Error logging workout", e);
+                    Toast.makeText(getContext(),
+                            "Failed to record workout: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                });
+    }
+
 
     @Override
     public void onDestroyView() {
