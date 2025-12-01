@@ -126,6 +126,9 @@ public class WorkoutFragment extends Fragment {
                 updateUserStats(xpToAdd, mins);
                 Toast.makeText(getContext(), "You earned " + xpToAdd + " XP and logged " + mins + " mins!", Toast.LENGTH_SHORT).show();
 
+                // Log workout in workouts collection
+                logWorkout(xpToAdd, mins, "general");
+
                 // 2. Check Streak Condition (> 10 mins)
                 if (mins >= 10) {
                     updateWorkoutAndStreak();
@@ -274,6 +277,35 @@ public class WorkoutFragment extends Fragment {
                     }
                 }
             });
+    }
+
+    private void logWorkout(long xp, int durationMinutes, String type) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            return;
+        }
+
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        // Build workout document data
+        java.util.Map<String, Object> workoutData = new java.util.HashMap<>();
+        workoutData.put("userID", uid);
+        workoutData.put("xp", xp);
+        workoutData.put("workoutType", type);
+        workoutData.put("date", Timestamp.now());
+        workoutData.put("duration", durationMinutes);
+
+        db.collection("workouts")
+                .add(workoutData)
+                .addOnSuccessListener(docRef ->
+                        Log.d("WorkoutFragment", "Workout logged with ID: " + docRef.getId())
+                )
+                .addOnFailureListener(e -> {
+                    Log.e("WorkoutFragment", "Error logging workout", e);
+                    Toast.makeText(getContext(),
+                            "Failed to record workout: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                });
     }
 
     @Override

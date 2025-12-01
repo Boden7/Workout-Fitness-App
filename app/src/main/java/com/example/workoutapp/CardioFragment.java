@@ -99,7 +99,7 @@ public class CardioFragment extends Fragment {
             viewModel.isRunning = false;
 
             int mins = viewModel.seconds / 60;
-            
+
             // Update local UI for minutes
             minutesText.setText(String.valueOf(mins));
 
@@ -107,13 +107,21 @@ public class CardioFragment extends Fragment {
                 // 1. Update Basic Stats (XP, Time, Count)
                 long xpToAdd = mins * 100L;
                 updateUserStats(xpToAdd, mins);
-                Toast.makeText(getContext(), "You earned " + xpToAdd + " XP and logged " + mins + " mins!", Toast.LENGTH_SHORT).show();
+
+                // Log workout in workouts collection
+                logWorkout(xpToAdd, mins, "cardio");
+
+                Toast.makeText(getContext(),
+                        "You earned " + xpToAdd + " XP and logged " + mins + " mins!",
+                        Toast.LENGTH_SHORT).show();
 
                 // 2. Check Streak Condition (> 10 mins)
                 if (mins >= 10) {
                     updateWorkoutAndStreak();
                 } else {
-                    Toast.makeText(getContext(), "Workout needs to be at least 10 mins to update streak.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(),
+                            "Workout needs to be at least 10 mins to update streak.",
+                            Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -125,6 +133,7 @@ public class CardioFragment extends Fragment {
 
             handler.removeCallbacks(timerRunnable);
         });
+
 
         // Back button
         backButton.setOnClickListener(v -> {
@@ -264,6 +273,36 @@ public class CardioFragment extends Fragment {
                 }
             });
     }
+
+    private void logWorkout(long xp, int durationMinutes, String type) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            return;
+        }
+
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        // Build workout document data
+        java.util.Map<String, Object> workoutData = new java.util.HashMap<>();
+        workoutData.put("userID", uid);
+        workoutData.put("xp", xp);
+        workoutData.put("workoutType", type);
+        workoutData.put("date", Timestamp.now());
+        workoutData.put("duration", durationMinutes);
+
+        db.collection("workouts")
+                .add(workoutData)
+                .addOnSuccessListener(docRef ->
+                        Log.d("CardioFragment", "Workout logged with ID: " + docRef.getId())
+                )
+                .addOnFailureListener(e -> {
+                    Log.e("CardioFragment", "Error logging workout", e);
+                    Toast.makeText(getContext(),
+                            "Failed to record workout: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                });
+    }
+
 
     @Override
     public void onDestroyView() {
