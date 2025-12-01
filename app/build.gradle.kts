@@ -51,4 +51,7 @@ dependencies {
 
     // Card view
     implementation("androidx.cardview:cardview:1.0.0")
+
+    // Circle ImageView
+    implementation("de.hdodenhof:circleimageview:3.1.0")
 }

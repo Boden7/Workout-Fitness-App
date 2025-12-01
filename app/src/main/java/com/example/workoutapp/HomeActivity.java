@@ -28,6 +28,8 @@ public class HomeActivity extends AppCompatActivity {
                 selectedFragment = new ProfileFragment();
             } else if (itemId == R.id.nav_workout) {
                 selectedFragment = new WorkoutFragment();
+            } else if (itemId == R.id.nav_challenge) {
+                selectedFragment = new ChallengeFragment();
             }
 
             if (selectedFragment != null) {
