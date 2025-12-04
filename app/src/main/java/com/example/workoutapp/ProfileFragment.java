@@ -215,6 +215,9 @@ public class ProfileFragment extends Fragment {
                     if (totalWorkout != null) {
                         workoutCount.setText(String.valueOf(totalWorkout));
                     }
+                    else{
+                        workoutCount.setText("0");
+                    }
 
                 } else {
                     Toast.makeText(getContext(), "User data not found", Toast.LENGTH_SHORT).show();

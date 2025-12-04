@@ -59,7 +59,7 @@ public class CreateAccount extends AppCompatActivity {
             String confirmPassword = confirmPasswordInput.getText().toString();
 
             // Validate fields
-            if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(confirmPassword)) {
+            if (TextUtils.isEmpty(email) || TextUtils.isEmpty(name) || TextUtils.isEmpty(password) || TextUtils.isEmpty(confirmPassword)) {
                 Toast.makeText(CreateAccount.this, "Please fill out all fields", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -92,6 +92,7 @@ public class CreateAccount extends AppCompatActivity {
                         String uid = fbUser.getUid();
                         String userEmail = fbUser.getEmail();
                         FirebaseFirestore db = FirebaseFirestore.getInstance();
+                        int profilePictureID = (int) (Math.random() * 4);
 
                         DocumentReference userRef = db.collection("users").document(uid);
                         DocumentReference counterRef = db.collection("_meta").document("leaderboard");
@@ -114,19 +115,26 @@ public class CreateAccount extends AppCompatActivity {
                             // 3) Create user document
                             Map<String, Object> userDoc = new HashMap<>();
                             userDoc.put("userID", uid);
-                            userDoc.put("name", name);
-                            userDoc.put("email", userEmail);
+
                             userDoc.put("level", 1);
                             userDoc.put("streak", 0);
-                            userDoc.put("badges", new ArrayList<String>());
                             userDoc.put("totalXP", 0);
                             userDoc.put("totalTime", 0);
                             userDoc.put("course", 0);
-                            userDoc.put("receiveNotifs", false);
-                            userDoc.put("lastWorkoutId", null);
-                            userDoc.put("lastWorkoutDate", null);
-                            userDoc.put("friends", new ArrayList<String>());
                             userDoc.put("leaderboard", next);
+                            userDoc.put("profilePictureID", profilePictureID);
+
+                            userDoc.put("badges", new ArrayList<String>());
+                            userDoc.put("friends", new ArrayList<String>());
+                            userDoc.put("groupChallengeParticipants", new ArrayList<String>());
+
+                            userDoc.put("lastWorkoutId", null);
+                            userDoc.put("name", name);
+                            userDoc.put("email", userEmail);
+
+                            userDoc.put("lastWorkoutDate", null);
+
+                            userDoc.put("receiveNotifs", false);
 
                             transaction.set(userRef, userDoc);
                             return null;

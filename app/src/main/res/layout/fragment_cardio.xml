@@ -132,11 +132,12 @@
 
         <TextView
             android:id="@+id/stepsText"
-            android:layout_width="42dp"
-            android:layout_height="38dp"
-            android:layout_marginStart="76dp"
+            android:layout_width="69dp"
+            android:layout_height="45dp"
+            android:layout_marginStart="48dp"
             android:layout_marginTop="16dp"
             android:text="0"
+            android:textAlignment="center"
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -144,27 +145,17 @@
 
         <TextView
             android:id="@+id/minutesText"
-            android:layout_width="44dp"
-            android:layout_height="38dp"
-            android:layout_marginTop="88dp"
-            android:layout_marginEnd="256dp"
+            android:layout_width="69dp"
+            android:layout_height="45dp"
+            android:layout_marginStart="48dp"
+            android:layout_marginTop="84dp"
+            android:layout_marginEnd="260dp"
             android:text="0"
+            android:textAlignment="center"
             android:textSize="16sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/walkingRunningFrame"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/caloriesText"
-            android:layout_width="90dp"
-            android:layout_height="24dp"
-            android:layout_marginEnd="248dp"
-            android:text="Calories: 0"
-            android:textColor="#231B1B"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
