@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -118,8 +119,19 @@ public class LeaderboardFragment extends Fragment {
 
                             LeaderboardUser user = new LeaderboardUser(uid, name, xp);
                             
-                            // 2. Assign Random Avatar
-                            assignRandomAvatar(user);
+                            // 2. Assign Avatar
+                            if (doc.getLong("profilePictureID") == 1){
+                                user.setAvatarResId(R.drawable.boy);
+                            }
+                            else if (doc.getLong("profilePictureID") == 2){
+                                user.setAvatarResId(R.drawable.man);
+                            }
+                            else if (doc.getLong("profilePictureID") == 3){
+                                user.setAvatarResId(R.drawable.girl);
+                            }
+                            else{
+                                user.setAvatarResId(R.drawable.woman);
+                            }
                             
                             tempUsers.add(user);
                         }
@@ -136,27 +148,6 @@ public class LeaderboardFragment extends Fragment {
                         }
                     });
         }
-    }
-
-    private void assignRandomAvatar(LeaderboardUser user) {
-        int[] avatars = {
-            R.drawable.boy,
-            R.drawable.girl,
-            R.drawable.man,
-            R.drawable.woman
-        };
-        Random random = new Random();
-        // Use hash code of UID or name to keep avatar consistent for the same user across reloads if desired.
-        // But request said "random", usually implies "pick one". 
-        // To make it consistent per session but random per user, we can just pick one.
-        // If we want it to change every time we load the fragment, simple random is fine.
-        // If we want it semi-consistent without storing in DB, use UID hash.
-        // I will use simple random as requested "randomly". 
-        // However, using UID hash is better UX so the user doesn't change gender every refresh.
-        // Let's use simple Random for now as per "randomly".
-        
-        int index = random.nextInt(avatars.length);
-        user.setAvatarResId(avatars[index]);
     }
 
     private void processLeaderboard(List<LeaderboardUser> users) {

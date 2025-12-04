@@ -190,10 +190,20 @@ public class ProfileFragment extends Fragment {
             String uid = currentUser.getUid();
             DocumentReference userRef = db.collection("users").document(uid);
 
-            profileImage.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.boy));
-
             userRef.get().addOnSuccessListener(documentSnapshot -> {
                 if (documentSnapshot.exists()) {
+                    if (documentSnapshot.getLong("profilePictureID") == 1){
+                        profileImage.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.boy));
+                    }
+                    else if (documentSnapshot.getLong("profilePictureID") == 2){
+                        profileImage.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.man));
+                    }
+                    else if (documentSnapshot.getLong("profilePictureID") == 3){
+                        profileImage.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.girl));
+                    }
+                    else{
+                        profileImage.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.woman));
+                    }
                     String email = documentSnapshot.getString("email");
                     userId = documentSnapshot.getString("userID");
                     username.setText(documentSnapshot.getString("name"));
@@ -235,13 +245,16 @@ public class ProfileFragment extends Fragment {
                 db.collection("users").document(friendId).get().addOnSuccessListener(friendDoc -> {
                     if (friendDoc.exists()) {
                         String email = friendDoc.getString("email");
+                        Long profilePictureID = friendDoc.getLong("profilePictureID");
 
                         if (email != null) {
                             Map<String, String> friend = new HashMap<>();
                             friend.put("username", email.split("@")[0]);
                             friend.put("email", email);
+                            friend.put("profilePictureID", String.valueOf(profilePictureID));
                             friendsData.add(friend);
                             friendsAdapter.notifyDataSetChanged();
+
                         }
                     }
                 });
@@ -275,7 +288,20 @@ public class ProfileFragment extends Fragment {
             Map<String, String> friend = friends.get(position);
             holder.friendUsername.setText(friend.get("username"));
             holder.friendHandle.setText("@" + friend.get("email"));
-            holder.friendAvatar.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.boy));
+            // 2. Assign Avatar
+            Long profilePicture = Long.valueOf(friend.get("profilePictureID"));
+            if (profilePicture == 1){
+                holder.friendAvatar.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.boy));
+            }
+            else if (profilePicture == 2){
+                holder.friendAvatar.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.man));
+            }
+            else if (profilePicture == 3){
+                holder.friendAvatar.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.girl));
+            }
+            else{
+                holder.friendAvatar.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.woman));
+            }
         }
 
         @Override
