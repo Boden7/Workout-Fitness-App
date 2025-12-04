@@ -49,7 +49,7 @@
             android:id="@+id/username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="John Welch"
+            android:text=""
             android:textColor="@android:color/black"
             android:textSize="24sp"
             android:textStyle="bold" />
@@ -58,7 +58,7 @@
             android:id="@+id/user_handle_and_join_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@johntheside • Joined December 2020"
+            android:text=""
             android:textColor="@android:color/darker_gray" />
 
     </LinearLayout>
@@ -93,7 +93,7 @@
                     android:id="@+id/friends_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="11"
+                    android:text=""
                     android:textColor="@android:color/white"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -128,7 +128,7 @@
                 android:id="@+id/workout_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="9"
+                android:text=""
                 android:textColor="@android:color/black"
                 android:textSize="18sp"
                 android:textStyle="bold" />

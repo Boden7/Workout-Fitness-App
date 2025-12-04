@@ -196,16 +196,13 @@ public class ProfileFragment extends Fragment {
                 if (documentSnapshot.exists()) {
                     String email = documentSnapshot.getString("email");
                     userId = documentSnapshot.getString("userID");
-
-                    if (email != null) {
-                        username.setText(email.split("@")[0]);
-                    }
+                    username.setText(documentSnapshot.getString("name"));
 
                     if (email != null && currentUser.getMetadata() != null) {
                         long creationTimestamp = currentUser.getMetadata().getCreationTimestamp();
                         SimpleDateFormat sdf = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
                         String joinDate = "Joined " + sdf.format(new Date(creationTimestamp));
-                        userHandleAndJoinDate.setText("@" + email + " • " + joinDate);
+                        userHandleAndJoinDate.setText(email + " • " + joinDate);
                     }
 
                     List<String> friendIds = (List<String>) documentSnapshot.get("friends");

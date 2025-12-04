@@ -22,6 +22,7 @@ import com.google.firebase.firestore.SetOptions;
 
 public class CreateAccount extends AppCompatActivity {
     private EditText emailInput;
+    private EditText nameInput;
     private EditText passwordInput;
     private EditText confirmPasswordInput;
 
@@ -44,6 +45,7 @@ public class CreateAccount extends AppCompatActivity {
         );
 
         emailInput = findViewById(R.id.createEmail);
+        nameInput = findViewById(R.id.createName);
         passwordInput = findViewById(R.id.createPassword);
         confirmPasswordInput = findViewById(R.id.createPassword2);
 
@@ -52,6 +54,7 @@ public class CreateAccount extends AppCompatActivity {
         Button createButton = findViewById(R.id.createButton);
         createButton.setOnClickListener(v -> {
             String email = emailInput.getText().toString().trim();
+            String name = nameInput.getText().toString().trim();
             String password = passwordInput.getText().toString();
             String confirmPassword = confirmPasswordInput.getText().toString();
 
@@ -111,6 +114,7 @@ public class CreateAccount extends AppCompatActivity {
                             // 3) Create user document
                             Map<String, Object> userDoc = new HashMap<>();
                             userDoc.put("userID", uid);
+                            userDoc.put("name", name);
                             userDoc.put("email", userEmail);
                             userDoc.put("level", 1);
                             userDoc.put("streak", 0);
