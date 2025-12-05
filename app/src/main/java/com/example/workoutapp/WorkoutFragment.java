@@ -33,6 +33,7 @@ public class WorkoutFragment extends Fragment {
     private LinearLayout pauseStopContainer;
     private Handler handler = new Handler();
 
+    // Timer Runnable
     private final Runnable runnable = new Runnable() {
         @Override
         public void run() {
@@ -72,15 +73,13 @@ public class WorkoutFragment extends Fragment {
         stopButton = view.findViewById(R.id.stopButton);
         pauseStopContainer = view.findViewById(R.id.pauseStopContainer);
 
-        // Restore timer text
+        // Restore timer display
         updateTimerText();
 
-        // Restore button UI state
+        // Restore UI state
         restoreTimerUIState();
 
-        // --------------------------
-        // START / RESUME BUTTON
-        // --------------------------
+        // START / RESUME
         startButton.setOnClickListener(v -> {
             startTimerInternal();
             startButton.setVisibility(View.GONE);
@@ -88,27 +87,21 @@ public class WorkoutFragment extends Fragment {
             pauseButton.setVisibility(View.VISIBLE);
         });
 
-        // --------------------------
-        // PAUSE BUTTON
-        // --------------------------
+        // PAUSE
         pauseButton.setOnClickListener(v -> {
             pauseTimerInternal();
-
-            // Show **only resume**
             startButton.setText("Resume");
             startButton.setVisibility(View.VISIBLE);
-            pauseStopContainer.setVisibility(View.GONE); // hide Pause + Stop completely
+            pauseStopContainer.setVisibility(View.GONE);
         });
 
-        // --------------------------
-        // STOP BUTTON
-        // --------------------------
+        // STOP
         stopButton.setOnClickListener(v -> {
             completeAndResetWorkout();
             resetTimerUI();
         });
 
-        // Category navigation (unchanged)
+        // Categories
         view.findViewById(R.id.categoryCardio)
                 .setOnClickListener(v -> navigate(new CardioFragment()));
 
@@ -166,12 +159,10 @@ public class WorkoutFragment extends Fragment {
             pauseStopContainer.setVisibility(View.VISIBLE);
             handler.post(runnable);
         } else if (viewModel.seconds > 0) {
-            // paused
             startButton.setText("Resume");
             startButton.setVisibility(View.VISIBLE);
             pauseStopContainer.setVisibility(View.GONE);
         } else {
-            // never started
             startButton.setText("Start");
             startButton.setVisibility(View.VISIBLE);
             pauseStopContainer.setVisibility(View.GONE);
@@ -194,7 +185,6 @@ public class WorkoutFragment extends Fragment {
 
     public void pauseTimerFromVideo() {
         pauseTimerInternal();
-
         startButton.setText("Resume");
         startButton.setVisibility(View.VISIBLE);
         pauseStopContainer.setVisibility(View.GONE);
@@ -202,16 +192,12 @@ public class WorkoutFragment extends Fragment {
 
     public void stopTimerFromVideo() {
         completeAndResetWorkout();
-
-        startButton.setText("Start");
-        startButton.setVisibility(View.VISIBLE);
-
-        pauseStopContainer.setVisibility(View.GONE);
-        pauseButton.setVisibility(View.GONE);
-
-        timerText.setText("00:00");
+        resetTimerUI();
     }
 
+    // --------------------------
+    // COMPLETE WORKOUT + XP + STREAK
+    // --------------------------
     private void completeAndResetWorkout() {
         int mins = viewModel.seconds / 60;
 
@@ -227,10 +213,129 @@ public class WorkoutFragment extends Fragment {
         resetTimerValues();
     }
 
-    private void updateWorkoutAndStreak() { /* unchanged */ }
-    private void updateUserStats(long xpToAdd, int minutesToAdd) { /* unchanged */ }
-    private void checkForLevelUp(String uid, long addedXP) { /* unchanged */ }
-    private void logWorkout(long xp, int durationMinutes, String type) { /* unchanged */ }
+    // --------------------------
+    // FIREBASE HELPERS
+    // --------------------------
+    private void updateWorkoutAndStreak() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) return;
+
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DocumentReference ref = db.collection("users").document(uid);
+
+        ref.get().addOnSuccessListener(doc -> {
+
+            Timestamp lastTS = doc.getTimestamp("lastWorkoutDate");
+            Long streak = doc.getLong("streak");
+            if (streak == null) streak = 0L;
+
+            LocalDate today = LocalDate.now();
+            long newStreak = streak;
+            long bonusXP = 0;
+
+            if (lastTS == null) {
+                newStreak = 1;
+                bonusXP = 500;
+            } else {
+                LocalDate lastDate = lastTS.toDate()
+                        .toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+                if (today.isEqual(lastDate)) {
+                    bonusXP = 0;
+                } else if (today.minusDays(1).isEqual(lastDate)) {
+                    newStreak = streak + 1;
+
+                    if (newStreak == 2) bonusXP = 1000;
+                    else if (newStreak >= 3) bonusXP = 1500;
+                    else bonusXP = 500;
+
+                } else {
+                    newStreak = 1;
+                    bonusXP = 500;
+                }
+            }
+
+            if (bonusXP > 0) {
+                long finalBonus = bonusXP;
+
+                ref.update(
+                        "streak", newStreak,
+                        "lastWorkoutDate", Timestamp.now(),
+                        "totalXP", FieldValue.increment(bonusXP)
+                ).addOnSuccessListener(a ->
+                        checkForLevelUp(uid, finalBonus)
+                );
+
+                Toast.makeText(getContext(),
+                        "Streak Day " + newStreak + "! Bonus: " + bonusXP + " XP!",
+                        Toast.LENGTH_LONG).show();
+            } else {
+                ref.update("lastWorkoutDate", Timestamp.now());
+            }
+        });
+    }
+
+    private void updateUserStats(long xpToAdd, int minutesToAdd) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) return;
+
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DocumentReference ref = db.collection("users").document(uid);
+
+        ref.update(
+                "totalXP", FieldValue.increment(xpToAdd),
+                "totalTime", FieldValue.increment(minutesToAdd),
+                "totalWorkout", FieldValue.increment(1)
+        ).addOnSuccessListener(a ->
+                checkForLevelUp(uid, xpToAdd)
+        ).addOnFailureListener(e ->
+                Log.e("WorkoutFragment", "Error updating stats", e)
+        );
+    }
+
+    private void checkForLevelUp(String uid, long addedXP) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("users").document(uid)
+                .get().addOnSuccessListener(doc -> {
+
+                    Long totalXP = doc.getLong("totalXP");
+                    if (totalXP == null) return;
+
+                    long currentLevel = totalXP / 1000;
+                    long oldLevel = (totalXP - addedXP) / 1000;
+
+                    if (currentLevel > oldLevel) {
+                        String badge = currentLevel + " Level Badge";
+
+                        db.collection("users").document(uid)
+                                .update(
+                                        "level", currentLevel,
+                                        "badges", FieldValue.arrayUnion(badge)
+                                );
+
+                        Toast.makeText(getContext(),
+                                "Level Up! Now Level " + currentLevel,
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+    private void logWorkout(long xp, int durationMinutes, String type) {
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) return;
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        java.util.Map<String, Object> workoutData = new java.util.HashMap<>();
+        workoutData.put("userID", uid);
+        workoutData.put("xp", xp);
+        workoutData.put("duration", durationMinutes);
+        workoutData.put("workoutType", type);
+        workoutData.put("date", Timestamp.now());
+
+        db.collection("workouts").add(workoutData);
+    }
 
     @Override
     public void onDestroyView() {
