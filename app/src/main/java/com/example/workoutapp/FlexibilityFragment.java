@@ -61,15 +61,19 @@ public class FlexibilityFragment extends Fragment {
         SharedPreferences prefs = getActivity()
                 .getSharedPreferences("video_prefs", Context.MODE_PRIVATE);
 
-        String[] flexVideos = {"video4", "video5", "video6"};
-
+        String[] allVideos = {
+                "video1","video2","video3",
+                "video4","video5","video6",
+                "video7","video8","video9",
+                "video10","video11"
+        };
         int uniqueWatched = 0;
-        for (String name : flexVideos) {
+        for (String name : allVideos) {
             int count = prefs.getInt("watch_count_" + name, 0);
             if (count > 0) uniqueWatched++;
         }
 
-        videosWatchedCounter.setText("Videos Watched: " + uniqueWatched);
+        videosWatchedCounter.setText("Total Videos Watched: " + uniqueWatched);
     }
 }
 

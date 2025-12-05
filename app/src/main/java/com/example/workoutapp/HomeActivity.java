@@ -1,13 +1,13 @@
 package com.example.workoutapp;
 
 import android.os.Bundle;
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class HomeActivity extends AppCompatActivity {
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,14 +20,22 @@ public class HomeActivity extends AppCompatActivity {
         nav.setItemIconTintList(null);
 
         nav.setOnItemSelectedListener(item -> {
-            Fragment selectedFragment = null;
             int itemId = item.getItemId();
+            Fragment selectedFragment = null;
+
             if (itemId == R.id.nav_home) {
                 selectedFragment = new HomeFragment();
             } else if (itemId == R.id.nav_profile) {
                 selectedFragment = new ProfileFragment();
             } else if (itemId == R.id.nav_workout) {
                 selectedFragment = new WorkoutFragment();
+
+                // ⭐ IMPORTANT: Give WorkoutFragment a tag
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_container, selectedFragment, "WORKOUT_FRAGMENT")
+                        .commit();
+                return true;
             } else if (itemId == R.id.nav_challenge) {
                 selectedFragment = new ChallengeFragment();
             } else if (itemId == R.id.nav_leaderboard) {
@@ -35,14 +43,16 @@ public class HomeActivity extends AppCompatActivity {
             }
 
             if (selectedFragment != null) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, selectedFragment).commit();
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_container, selectedFragment)
+                        .commit();
             }
             return true;
         });
 
         getSupportFragmentManager().addOnBackStackChangedListener(() -> {
             Fragment current = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-
 
             if (current instanceof StreakCalendar) {
                 toolbar.setLogo(null);
@@ -54,12 +64,15 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-        // Set default fragment
+        // Default fragment
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, new HomeFragment())
+                    .commit();
         }
 
-        // Handle Fire Icon Click in Toolbar
+        // Fire icon → streak calendar
         toolbar.setOnClickListener(v -> {
             getSupportFragmentManager()
                     .beginTransaction()
@@ -67,6 +80,5 @@ public class HomeActivity extends AppCompatActivity {
                     .addToBackStack(null)
                     .commit();
         });
-
     }
 }
