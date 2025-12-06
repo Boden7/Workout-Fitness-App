@@ -47,6 +47,7 @@ public class ChallengeFragment extends Fragment {
     private ImageView streakChest, lessonsChest;
 
     // Group Challenge
+    private TextView timeChallengeTitle; // Dynamic Title
     private ProgressBar timeProgress;
     private TextView timeProgressText;
     private ImageView timeChest;
@@ -59,6 +60,7 @@ public class ChallengeFragment extends Fragment {
     private Map<String, String> friendDetails = new HashMap<>();
     private List<String> selectedFriendIds = new ArrayList<>();
     private final int MAX_GROUP_PARTICIPANTS = 2;
+    private Map<String, Object> groupTimeSnapshot = new HashMap<>();
 
     // Reward System Data
     private Map<String, Object> challengeStatus = new HashMap<>();
@@ -89,6 +91,7 @@ public class ChallengeFragment extends Fragment {
         lessonsProgressText = view.findViewById(R.id.lessons_progress_text);
         lessonsChest = view.findViewById(R.id.lessons_chest);
 
+        timeChallengeTitle = view.findViewById(R.id.time_challenge_title);
         timeProgress = view.findViewById(R.id.time_progress);
         timeProgressText = view.findViewById(R.id.time_progress_text);
         timeChest = view.findViewById(R.id.time_chest);
@@ -110,8 +113,11 @@ public class ChallengeFragment extends Fragment {
         DocumentReference userRef = db.collection("users").document(currentUser.getUid());
         userRef.get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
-                if (documentSnapshot.contains("challenges") && documentSnapshot.get("challenges") instanceof Map) {
+                if (documentSnapshot.contains("challenges")) {
                     challengeStatus = (Map<String, Object>) documentSnapshot.get("challenges");
+                }
+                if (documentSnapshot.contains("groupChallengeTimeSnapshot")) {
+                    groupTimeSnapshot = (Map<String, Object>) documentSnapshot.get("groupChallengeTimeSnapshot");
                 }
 
                 loadPersonalChallenges(documentSnapshot);
@@ -121,7 +127,7 @@ public class ChallengeFragment extends Fragment {
                 }
 
                 fetchFriendDetails(() -> {
-                    if (documentSnapshot.contains("groupChallengeParticipants") && documentSnapshot.get("groupChallengeParticipants") instanceof List) {
+                    if (documentSnapshot.contains("groupChallengeParticipants")) {
                         selectedFriendIds = (List<String>) documentSnapshot.get("groupChallengeParticipants");
                     }
                     calculateGroupChallengeProgress();
@@ -157,84 +163,103 @@ public class ChallengeFragment extends Fragment {
     }
 
     private void loadPersonalChallenges(DocumentSnapshot userSnapshot) {
-        // --- Progressive Streak Challenge ---
         Long streak = userSnapshot.getLong("streak");
         int currentStreak = streak != null ? streak.intValue() : 0;
 
         int lastClaimedStreakLevel = 0;
-        if (challengeStatus.containsKey(STREAK_CHALLENGE)) {
+        if (challengeStatus.containsKey(STREAK_CHALLENGE) && challengeStatus.get(STREAK_CHALLENGE) instanceof Map) {
             Map<String, Object> status = (Map<String, Object>) challengeStatus.get(STREAK_CHALLENGE);
-            if (status != null && status.containsKey("lastClaimedLevel")) {
-                Long level = (Long) status.get("lastClaimedLevel");
-                if (level != null) {
-                    lastClaimedStreakLevel = level.intValue();
-                }
+            if (status.containsKey("lastClaimedLevel")) {
+                lastClaimedStreakLevel = ((Long) status.get("lastClaimedLevel")).intValue();
             }
         }
-        int targetStreak = lastClaimedStreakLevel + 1;
-        updateChallengeUI(streakProgress, streakProgressText, streakChest, currentStreak, targetStreak, STREAK_CHALLENGE, 500, "Streak Level " + targetStreak);
+        int newStreakLevel = lastClaimedStreakLevel + 1;
+        updateChallengeUI(streakProgress, streakProgressText, streakChest, currentStreak, newStreakLevel, STREAK_CHALLENGE, 500, "Streak Level " + newStreakLevel, newStreakLevel);
 
-        // --- Standard Daily Challenge ---
         Long totalWorkout = userSnapshot.getLong("totalWorkout");
         int currentTotalWorkout = totalWorkout != null ? totalWorkout.intValue() : 0;
-        updateChallengeUI(lessonsProgress, lessonsProgressText, lessonsChest, currentTotalWorkout, 5, LESSONS_CHALLENGE, 1000, "Lesson Learner");
+        updateChallengeUI(lessonsProgress, lessonsProgressText, lessonsChest, currentTotalWorkout, 5, LESSONS_CHALLENGE, 1000, "Lesson Learner", 1);
     }
 
     private void calculateGroupChallengeProgress() {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser == null) return;
 
-        List<String> participantUids = new ArrayList<>(selectedFriendIds);
-        participantUids.add(currentUser.getUid());
+        int lastClaimedGroupLevel = 0;
+        if (challengeStatus.containsKey(GROUP_CHALLENGE) && challengeStatus.get(GROUP_CHALLENGE) instanceof Map) {
+            Map<String, Object> status = (Map<String, Object>) challengeStatus.get(GROUP_CHALLENGE);
+            if (status.containsKey("lastClaimedLevel")) {
+                lastClaimedGroupLevel = ((Long) status.get("lastClaimedLevel")).intValue();
+            }
+        }
+        int newGroupLevel = lastClaimedGroupLevel + 1;
+        int groupTimeTarget = 30 + (lastClaimedGroupLevel * 15);
+        String groupBadgeName = "Team Player Level " + newGroupLevel;
+        if(timeChallengeTitle != null) {
+            timeChallengeTitle.setText("Workout " + groupTimeTarget + " mins with friends");
+        }
 
-        final int[] totalTime = {0};
-        final int[] usersProcessed = {0};
-        int groupTimeTarget = 30;
-
-        if (participantUids.isEmpty()) {
-            updateChallengeUI(timeProgress, timeProgressText, timeChest, 0, groupTimeTarget, GROUP_CHALLENGE, 1500, "Team Player");
+        if (selectedFriendIds.isEmpty()) {
+            updateChallengeUI(timeProgress, timeProgressText, timeChest, 0, groupTimeTarget, GROUP_CHALLENGE, 1500, groupBadgeName, newGroupLevel);
             updateGroupChallengeUI();
             return;
         }
+
+        List<String> participantUids = new ArrayList<>(selectedFriendIds);
+        participantUids.add(currentUser.getUid());
+
+        final long[] totalCurrentTime = {0};
+        final int[] usersProcessed = {0};
 
         for (String uid : participantUids) {
             db.collection("users").document(uid).get().addOnSuccessListener(doc -> {
                 if (doc.exists()) {
                     Long time = doc.getLong("totalTime");
-                    totalTime[0] += (time != null) ? time.intValue() : 0;
+                    totalCurrentTime[0] += (time != null) ? time : 0;
                 }
                 usersProcessed[0]++;
                 if (usersProcessed[0] == participantUids.size()) {
-                    updateChallengeUI(timeProgress, timeProgressText, timeChest, totalTime[0], groupTimeTarget, GROUP_CHALLENGE, 1500, "Team Player");
+                    long totalSnapshotTime = 0;
+                    for (String pUid : participantUids) {
+                        if (groupTimeSnapshot.containsKey(pUid)) {
+                            totalSnapshotTime += ((Long) groupTimeSnapshot.get(pUid));
+                        }
+                    }
+                    long progressDelta = totalCurrentTime[0] - totalSnapshotTime;
+                    updateChallengeUI(timeProgress, timeProgressText, timeChest, (int) progressDelta, groupTimeTarget, GROUP_CHALLENGE, 1500, groupBadgeName, newGroupLevel);
                 }
             });
         }
         updateGroupChallengeUI();
     }
 
-    private void updateChallengeUI(ProgressBar progressBar, TextView progressText, ImageView chest, int currentProgress, int target, String challengeKey, int xpReward, String badgeName) {
-        if (progressBar == null) return;
-        progressBar.setMax(target);
-        int progress = Math.min(currentProgress, target);
-        animateProgressBar(progressBar, progress);
-        progressText.setText(progress + "/" + target);
+    private void updateChallengeUI(ProgressBar pb, TextView text, ImageView chest, int current, int target, String key, int xp, String badge, int level) {
+        pb.setMax(target);
+        int progress = Math.min(current, target);
+        animateProgressBar(pb, progress);
+        text.setText(progress + "/" + target);
 
-        boolean isCompleted = currentProgress >= target;
+        boolean isCompleted = current >= target;
         boolean isClaimedToday = false;
 
-        if (challengeStatus.containsKey(challengeKey)) {
-            Map<String, Object> status = (Map<String, Object>) challengeStatus.get(challengeKey);
-            if (status != null && status.containsKey("lastClaimedTimestamp")) {
+        if (challengeStatus.containsKey(key) && challengeStatus.get(key) instanceof Map) {
+            Map<String, Object> status = (Map<String, Object>) challengeStatus.get(key);
+            if (status.containsKey("lastClaimedTimestamp")) {
                 Timestamp ts = (Timestamp) status.get("lastClaimedTimestamp");
-                if (ts != null) {
-                    isClaimedToday = isToday(ts.toDate().getTime());
+                if (ts != null && isToday(ts.toDate().getTime())) {
+                     int lastClaimedLevel = status.containsKey("lastClaimedLevel") ? ((Long) status.get("lastClaimedLevel")).intValue() : 0;
+                     if (key.equals(STREAK_CHALLENGE) || key.equals(GROUP_CHALLENGE)){
+                        if(lastClaimedLevel >= level){
+                            isClaimedToday = true;
+                        }
+                     } else {
+                         isClaimedToday = true;
+                     }
                 }
             }
         }
 
-        chest.setVisibility(View.VISIBLE);
         chest.setOnClickListener(null);
-
         if (isCompleted) {
             if (isClaimedToday) {
                 chest.setImageResource(R.drawable.ic_chest_opened);
@@ -244,7 +269,7 @@ public class ChallengeFragment extends Fragment {
                 chest.setImageResource(R.drawable.ic_chest);
                 chest.setAlpha(1.0f);
                 chest.setEnabled(true);
-                chest.setOnClickListener(v -> claimReward(challengeKey, xpReward, badgeName, target));
+                chest.setOnClickListener(v -> claimReward(key, xp, badge, level));
             }
         } else {
             chest.setImageResource(R.drawable.ic_chest);
@@ -253,45 +278,38 @@ public class ChallengeFragment extends Fragment {
         }
     }
 
-    private void claimReward(String challengeKey, int xpReward, String badgeName, int completedLevel) {
+    private void claimReward(String key, int xp, String badge, int level) {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser == null) return;
 
-        new AlertDialog.Builder(getContext())
-                .setTitle("Challenge Complete!")
-                .setMessage("You earned: \n\n+ " + xpReward + " XP\n+ '" + badgeName + "' Badge")
-                .setPositiveButton("Claim", (dialog, which) -> {
-                    DocumentReference userRef = db.collection("users").document(currentUser.getUid());
+        new AlertDialog.Builder(getContext()).setTitle("Challenge Complete!").setMessage("You earned: \n\n+ " + xp + " XP\n+ '" + badge + "' Badge").setPositiveButton("Claim", (dialog, which) -> {
+            DocumentReference userRef = db.collection("users").document(currentUser.getUid());
+            Map<String, Object> updates = new HashMap<>();
+            updates.put("totalXP", FieldValue.increment(xp));
+            updates.put("badges", FieldValue.arrayUnion(badge));
+            updates.put("challenges." + key + ".lastClaimedTimestamp", FieldValue.serverTimestamp());
 
-                    Map<String, Object> updates = new HashMap<>();
-                    updates.put("totalXP", FieldValue.increment(xpReward));
-                    updates.put("badges", FieldValue.arrayUnion(badgeName));
-                    updates.put("challenges." + challengeKey + ".lastClaimedTimestamp", FieldValue.serverTimestamp());
+            if (key.equals(STREAK_CHALLENGE) || key.equals(GROUP_CHALLENGE)) {
+                updates.put("challenges." + key + ".lastClaimedLevel", level);
+            }
+            if (key.equals(GROUP_CHALLENGE)) {
+                updates.put("groupChallengeParticipants", new ArrayList<>());
+                updates.put("groupChallengeTimeSnapshot", new HashMap<>());
+            }
 
-                    if (challengeKey.equals(STREAK_CHALLENGE)) {
-                        updates.put("challenges." + STREAK_CHALLENGE + ".lastClaimedLevel", completedLevel);
-                    }
-
-                    userRef.update(updates).addOnSuccessListener(aVoid -> {
-                        Toast.makeText(getContext(), "Reward claimed!", Toast.LENGTH_SHORT).show();
-                        loadAllChallengeData();
-                    }).addOnFailureListener(e -> {
-                        Toast.makeText(getContext(), "Failed to claim reward. Please try again.", Toast.LENGTH_SHORT).show();
-                    });
-                })
-                .show();
+            userRef.update(updates).addOnSuccessListener(aVoid -> {
+                Toast.makeText(getContext(), "Reward claimed!", Toast.LENGTH_SHORT).show();
+                loadAllChallengeData();
+            }).addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to claim reward.", Toast.LENGTH_SHORT).show());
+        }).show();
     }
 
     private boolean isToday(long timestamp) {
-        if (timestamp == 0) return false;
         Calendar cal1 = Calendar.getInstance();
         cal1.setTimeInMillis(timestamp);
         Calendar cal2 = Calendar.getInstance();
-        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
-                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) && cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
     }
-
-    // --- Other methods (unchanged) ---
 
     private void showFriendSelectionDialog() {
         if (friendIds == null || friendIds.isEmpty()) {
@@ -311,8 +329,7 @@ public class ChallengeFragment extends Fragment {
 
         List<String> tempSelected = new ArrayList<>(selectedFriendIds);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Select up to " + MAX_GROUP_PARTICIPANTS + " friends")
+        new AlertDialog.Builder(getContext()).setTitle("Select up to " + MAX_GROUP_PARTICIPANTS + " friends")
                 .setMultiChoiceItems(friendDisplayNames, checkedItems, (dialog, which, isChecked) -> {
                     if (isChecked) {
                         if (tempSelected.size() >= MAX_GROUP_PARTICIPANTS) {
@@ -333,18 +350,34 @@ public class ChallengeFragment extends Fragment {
                 .show();
     }
 
-    private void updateGroupChallengeInFirebase(){
+
+    private void updateGroupChallengeInFirebase() {
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
-            DocumentReference userRef = db.collection("users").document(currentUser.getUid());
-            userRef.update("groupChallengeParticipants", selectedFriendIds)
-                    .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(getContext(), "Group challenge updated!", Toast.LENGTH_SHORT).show();
-                        calculateGroupChallengeProgress();
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(getContext(), "Failed to update group challenge.", Toast.LENGTH_SHORT).show();
-                    });
+        if (currentUser == null) return;
+
+        DocumentReference ownerRef = db.collection("users").document(currentUser.getUid());
+        List<String> participantUids = new ArrayList<>(selectedFriendIds);
+        participantUids.add(currentUser.getUid());
+
+        Map<String, Object> snapshotMap = new HashMap<>();
+        final int[] usersProcessed = {0};
+
+        for (String uid : participantUids) {
+            db.collection("users").document(uid).get().addOnSuccessListener(doc -> {
+                if (doc.exists()) {
+                    snapshotMap.put(uid, doc.getLong("totalTime"));
+                }
+                usersProcessed[0]++;
+                if (usersProcessed[0] == participantUids.size()) {
+                    Map<String, Object> updates = new HashMap<>();
+                    updates.put("groupChallengeParticipants", selectedFriendIds);
+                    updates.put("groupChallengeTimeSnapshot", snapshotMap);
+                    ownerRef.update(updates).addOnSuccessListener(aVoid -> {
+                        Toast.makeText(getContext(), "Group challenge started!", Toast.LENGTH_SHORT).show();
+                        loadAllChallengeData();
+                    }).addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to start challenge.", Toast.LENGTH_SHORT).show());
+                }
+            });
         }
     }
 
@@ -365,13 +398,10 @@ public class ChallengeFragment extends Fragment {
     private void addParticipantToLayout(String userId) {
         LayoutInflater inflater = LayoutInflater.from(getContext());
         View participantView = inflater.inflate(R.layout.item_participant, participantsAvatarLayout, false);
-
         CircleImageView avatar = participantView.findViewById(R.id.participant_avatar);
         TextView name = participantView.findViewById(R.id.participant_name);
-
-        avatar.setImageResource(R.drawable.boy); // Placeholder image
+        avatar.setImageResource(R.drawable.boy);
         name.setText(friendDetails.getOrDefault(userId, "Friend"));
-
         participantsAvatarLayout.addView(participantView);
     }
 

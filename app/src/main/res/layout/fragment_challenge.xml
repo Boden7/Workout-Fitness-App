@@ -74,7 +74,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     tools:text="0/1"
-                    app:layout_constraintStart_toStartOf="@+id/streak_progress"
+                    app:layout_constraintStart_toStartOf="@id/streak_progress"
                     app:layout_constraintTop_toBottomOf="@id/streak_progress"
                     android:layout_marginTop="4dp"/>
 
@@ -83,7 +83,6 @@
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:src="@drawable/ic_chest"
-                    android:visibility="gone"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"/>
@@ -142,7 +141,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     tools:text="0/5"
-                    app:layout_constraintStart_toStartOf="@+id/lessons_progress"
+                    app:layout_constraintStart_toStartOf="@id/lessons_progress"
                     app:layout_constraintTop_toBottomOf="@+id/lessons_progress"
                     android:layout_marginTop="4dp"/>
 
@@ -151,7 +150,6 @@
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:src="@drawable/ic_chest"
-                    android:visibility="gone"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"/>
@@ -198,15 +196,15 @@
                         app:layout_constraintBottom_toBottomOf="parent"/>
 
                     <TextView
-                        android:id="@+id/time_title"
+                        android:id="@+id/time_challenge_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Exercise 30 minutes with Friends"
                         android:textColor="@android:color/black"
                         android:textStyle="bold"
                         android:layout_marginStart="16dp"
                         app:layout_constraintStart_toEndOf="@id/time_icon"
-                        app:layout_constraintTop_toTopOf="parent"/>
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:text="Workout 30 mins with friends" />
 
                     <ProgressBar
                         android:id="@+id/time_progress"
@@ -217,8 +215,8 @@
                         android:max="30"
                         android:progress="0"
                         android:layout_marginTop="8dp"
-                        app:layout_constraintStart_toStartOf="@id/time_title"
-                        app:layout_constraintTop_toBottomOf="@id/time_title"
+                        app:layout_constraintStart_toStartOf="@id/time_challenge_title"
+                        app:layout_constraintTop_toBottomOf="@id/time_challenge_title"
                         app:layout_constraintEnd_toStartOf="@+id/time_chest"/>
 
                     <TextView
@@ -226,7 +224,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         tools:text="0/30"
-                        app:layout_constraintStart_toStartOf="@+id/time_progress"
+                        app:layout_constraintStart_toStartOf="@id/time_progress"
                         app:layout_constraintTop_toBottomOf="@+id/time_progress"
                         android:layout_marginTop="4dp"/>
 
@@ -235,7 +233,6 @@
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:src="@drawable/ic_chest"
-                        android:visibility="gone"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"/>
