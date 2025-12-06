@@ -119,17 +119,17 @@ public class LeaderboardFragment extends Fragment {
 
                             LeaderboardUser user = new LeaderboardUser(uid, name, xp);
                             
-                            // 2. Assign Avatar
-                            if (doc.getLong("profilePictureID") == 1){
+                            // 2. Assign Avatar Safely
+                            Long profilePictureId = doc.getLong("profilePictureID");
+                            long safeProfilePictureId = (profilePictureId != null) ? profilePictureId : 1L;
+
+                            if (safeProfilePictureId == 1) {
                                 user.setAvatarResId(R.drawable.boy);
-                            }
-                            else if (doc.getLong("profilePictureID") == 2){
+                            } else if (safeProfilePictureId == 2) {
                                 user.setAvatarResId(R.drawable.man);
-                            }
-                            else if (doc.getLong("profilePictureID") == 3){
+                            } else if (safeProfilePictureId == 3) {
                                 user.setAvatarResId(R.drawable.girl);
-                            }
-                            else{
+                            } else {
                                 user.setAvatarResId(R.drawable.woman);
                             }
                             

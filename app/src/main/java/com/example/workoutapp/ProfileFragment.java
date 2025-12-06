@@ -4,22 +4,18 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.cardview.widget.CardView;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -42,8 +38,7 @@ import java.util.Map;
 public class ProfileFragment extends Fragment {
 
     private ImageView profileImage, settingsIcon;
-    private TextView username, userHandleAndJoinDate, friendsCount, workoutCount, historyPlaceholder, historyText, friendsText;
-    private CardView friendsButton, historyButton;
+    private TextView username, userHandleAndJoinDate, friendsCount;
     private RecyclerView friendsListRecyclerView;
     private MaterialButton inviteButton;
 
@@ -63,28 +58,23 @@ public class ProfileFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
 
         // Initialize Views
-        profileImage = view.findViewById(R.id.profile_image);
-        settingsIcon = view.findViewById(R.id.settings_icon);
-        username = view.findViewById(R.id.username);
-        userHandleAndJoinDate = view.findViewById(R.id.user_handle_and_join_date);
-        friendsCount = view.findViewById(R.id.friends_count);
-        workoutCount = view.findViewById(R.id.workout_count);
-        friendsButton = view.findViewById(R.id.friends_button);
-        historyButton = view.findViewById(R.id.history_button);
-        friendsListRecyclerView = view.findViewById(R.id.friends_list_recyclerview);
-        inviteButton = view.findViewById(R.id.invite_button);
-        historyPlaceholder = view.findViewById(R.id.history_placeholder);
-        historyText = view.findViewById(R.id.history_text);
-        friendsText = view.findViewById(R.id.friends_text);
+        initializeViews(view);
 
         setupRecyclerView();
         loadUserData();
         setupClickListeners();
 
-        // Default selection
-        selectTab(friendsButton);
-
         return view;
+    }
+
+    private void initializeViews(View view) {
+        profileImage = view.findViewById(R.id.profile_image);
+        settingsIcon = view.findViewById(R.id.settings_icon);
+        username = view.findViewById(R.id.username);
+        userHandleAndJoinDate = view.findViewById(R.id.user_handle_and_join_date);
+        friendsCount = view.findViewById(R.id.friends_count);
+        friendsListRecyclerView = view.findViewById(R.id.friends_list_recyclerview);
+        inviteButton = view.findViewById(R.id.invite_button);
     }
 
     private void setupRecyclerView() {
@@ -97,41 +87,8 @@ public class ProfileFragment extends Fragment {
         settingsIcon.setOnClickListener(v -> {
             Intent intent = new Intent(getContext(), SettingsActivity.class);
             startActivity(intent);
-                });
+        });
         inviteButton.setOnClickListener(v -> showAddFriendDialog());
-
-        friendsButton.setOnClickListener(v -> selectTab(friendsButton));
-        historyButton.setOnClickListener(v -> selectTab(historyButton));
-    }
-
-    private void selectTab(View tab) {
-        // Reset both tabs to default state
-        friendsButton.setCardBackgroundColor(Color.TRANSPARENT);
-        friendsCount.setTextColor(Color.BLACK);
-        friendsText.setTextColor(Color.DKGRAY);
-        friendsText.setAlpha(0.5f);
-
-        historyButton.setCardBackgroundColor(Color.TRANSPARENT);
-        workoutCount.setTextColor(Color.BLACK);
-        historyText.setTextColor(Color.DKGRAY);
-        historyText.setAlpha(0.5f);
-
-        // Set selected tab state
-        if (tab.getId() == R.id.friends_button) {
-            friendsButton.setCardBackgroundColor(ContextCompat.getColor(getContext(), R.color.red_light));
-            friendsCount.setTextColor(Color.WHITE);
-            friendsText.setTextColor(Color.WHITE);
-            friendsText.setAlpha(1.0f);
-            friendsListRecyclerView.setVisibility(View.VISIBLE);
-            historyPlaceholder.setVisibility(View.GONE);
-        } else {
-            historyButton.setCardBackgroundColor(ContextCompat.getColor(getContext(), R.color.red_light));
-            workoutCount.setTextColor(Color.WHITE);
-            historyText.setTextColor(Color.WHITE);
-            historyText.setAlpha(1.0f);
-            friendsListRecyclerView.setVisibility(View.GONE);
-            historyPlaceholder.setVisibility(View.VISIBLE);
-        }
     }
 
     private void showAddFriendDialog() {
@@ -192,18 +149,19 @@ public class ProfileFragment extends Fragment {
 
             userRef.get().addOnSuccessListener(documentSnapshot -> {
                 if (documentSnapshot.exists()) {
-                    if (documentSnapshot.getLong("profilePictureID") == 1){
-                        profileImage.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.boy));
+                    Long profilePictureID = documentSnapshot.getLong("profilePictureID");
+                    long safeProfilePictureId = (profilePictureID != null) ? profilePictureID : 1L;
+
+                    if (safeProfilePictureId == 1) {
+                        profileImage.setImageResource(R.drawable.boy);
+                    } else if (safeProfilePictureId == 2) {
+                        profileImage.setImageResource(R.drawable.man);
+                    } else if (safeProfilePictureId == 3) {
+                        profileImage.setImageResource(R.drawable.girl);
+                    } else {
+                        profileImage.setImageResource(R.drawable.woman);
                     }
-                    else if (documentSnapshot.getLong("profilePictureID") == 2){
-                        profileImage.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.man));
-                    }
-                    else if (documentSnapshot.getLong("profilePictureID") == 3){
-                        profileImage.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.girl));
-                    }
-                    else{
-                        profileImage.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.woman));
-                    }
+
                     String email = documentSnapshot.getString("email");
                     userId = documentSnapshot.getString("userID");
                     username.setText(documentSnapshot.getString("name"));
@@ -219,16 +177,9 @@ public class ProfileFragment extends Fragment {
                     if (friendIds != null) {
                         friendsCount.setText(String.valueOf(friendIds.size()));
                         displayFriendsList(friendIds);
+                    } else {
+                        friendsCount.setText("0");
                     }
-
-                    Long totalWorkout = documentSnapshot.getLong("totalWorkout");
-                    if (totalWorkout != null) {
-                        workoutCount.setText(String.valueOf(totalWorkout));
-                    }
-                    else{
-                        workoutCount.setText("0");
-                    }
-
                 } else {
                     Toast.makeText(getContext(), "User data not found", Toast.LENGTH_SHORT).show();
                 }
@@ -254,7 +205,6 @@ public class ProfileFragment extends Fragment {
                             friend.put("profilePictureID", String.valueOf(profilePictureID));
                             friendsData.add(friend);
                             friendsAdapter.notifyDataSetChanged();
-
                         }
                     }
                 });
@@ -266,10 +216,10 @@ public class ProfileFragment extends Fragment {
     }
 
     // --- Inner Class for FriendsAdapter ---
-    public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.ViewHolder> {
+    public static class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.ViewHolder> {
 
-        private List<Map<String, String>> friends;
-        private Context context;
+        private final List<Map<String, String>> friends;
+        private final Context context;
 
         public FriendsAdapter(Context context, List<Map<String, String>> friends) {
             this.context = context;
@@ -288,19 +238,30 @@ public class ProfileFragment extends Fragment {
             Map<String, String> friend = friends.get(position);
             holder.friendUsername.setText(friend.get("username"));
             holder.friendHandle.setText("@" + friend.get("email"));
-            // 2. Assign Avatar
-            Long profilePicture = Long.valueOf(friend.get("profilePictureID"));
-            if (profilePicture == 1){
-                holder.friendAvatar.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.boy));
+
+            // Safely get and parse profilePictureID
+            String profilePictureIdString = friend.get("profilePictureID");
+            long profilePicture;
+
+            try {
+                if (profilePictureIdString != null && !profilePictureIdString.equals("null")) {
+                    profilePicture = Long.parseLong(profilePictureIdString);
+                } else {
+                    profilePicture = 1L; // Default to 1 if the value is null
+                }
+            } catch (NumberFormatException e) {
+                profilePicture = 1L; // Default to 1 if parsing fails
             }
-            else if (profilePicture == 2){
-                holder.friendAvatar.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.man));
-            }
-            else if (profilePicture == 3){
-                holder.friendAvatar.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.girl));
-            }
-            else{
-                holder.friendAvatar.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.woman));
+
+            // Assign Avatar based on the safe profilePicture value
+            if (profilePicture == 1) {
+                holder.friendAvatar.setImageResource(R.drawable.boy);
+            } else if (profilePicture == 2) {
+                holder.friendAvatar.setImageResource(R.drawable.man);
+            } else if (profilePicture == 3) {
+                holder.friendAvatar.setImageResource(R.drawable.girl);
+            } else {
+                holder.friendAvatar.setImageResource(R.drawable.woman);
             }
         }
 
@@ -309,7 +270,7 @@ public class ProfileFragment extends Fragment {
             return friends.size();
         }
 
-        public class ViewHolder extends RecyclerView.ViewHolder {
+        public static class ViewHolder extends RecyclerView.ViewHolder {
             ImageView friendAvatar;
             TextView friendUsername;
             TextView friendHandle;
