@@ -123,6 +123,7 @@ public class CreateAccount extends AppCompatActivity {
                             userDoc.put("course", 0);
                             userDoc.put("leaderboard", next);
                             userDoc.put("profilePictureID", profilePictureID);
+                            userDoc.put("totalWorkout", 0);
 
                             userDoc.put("badges", new ArrayList<String>());
                             userDoc.put("friends", new ArrayList<String>());

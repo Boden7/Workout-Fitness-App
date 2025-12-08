@@ -195,12 +195,13 @@ public class ProfileFragment extends Fragment {
             for (String friendId : friendIds) {
                 db.collection("users").document(friendId).get().addOnSuccessListener(friendDoc -> {
                     if (friendDoc.exists()) {
+                        String name = friendDoc.getString("name");
                         String email = friendDoc.getString("email");
                         Long profilePictureID = friendDoc.getLong("profilePictureID");
 
                         if (email != null) {
                             Map<String, String> friend = new HashMap<>();
-                            friend.put("username", email.split("@")[0]);
+                            friend.put("username", name);
                             friend.put("email", email);
                             friend.put("profilePictureID", String.valueOf(profilePictureID));
                             friendsData.add(friend);
@@ -237,7 +238,7 @@ public class ProfileFragment extends Fragment {
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             Map<String, String> friend = friends.get(position);
             holder.friendUsername.setText(friend.get("username"));
-            holder.friendHandle.setText("@" + friend.get("email"));
+            holder.friendHandle.setText(friend.get("email"));
 
             // Safely get and parse profilePictureID
             String profilePictureIdString = friend.get("profilePictureID");
