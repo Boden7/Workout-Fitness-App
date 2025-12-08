@@ -92,7 +92,7 @@ public class CreateAccount extends AppCompatActivity {
                         String uid = fbUser.getUid();
                         String userEmail = fbUser.getEmail();
                         FirebaseFirestore db = FirebaseFirestore.getInstance();
-                        int profilePictureID = (int) (Math.random() * 4);
+                        int profilePictureID = (int) (Math.random() * 3) + 1;
 
                         DocumentReference userRef = db.collection("users").document(uid);
                         DocumentReference counterRef = db.collection("_meta").document("leaderboard");
