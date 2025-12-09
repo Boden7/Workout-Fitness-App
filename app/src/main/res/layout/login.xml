@@ -29,10 +29,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:fontFamily="sans-serif-condensed"
-            android:text="Welcome to Fitness Tracker"
+            android:text="Welcome to GoalMate"
             android:textAlignment="center"
             android:textColor="#FFFFFF"
-            android:textSize="20sp"
+            android:textSize="40sp"
             android:textStyle="italic" />
 
         <EditText
